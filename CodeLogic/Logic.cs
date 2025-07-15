@@ -15,37 +15,36 @@ namespace LogAnalyzer.CodeLogic
 
         public static void LogAnalizerLogic()
         {
-            Debug.WriteLine("Hello");           
+            Debug.WriteLine("Hello");
+            string? filePath = WorkFile();
+            List<long> byteOffSet = GetByteOffSets(filePath);
+            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            using (StreamReader sr = new StreamReader(fs))
+            {
+                foreach (var index in ArbitrarySearch(byteOffSet, "this is red", filePath))
+                {
+                    fs.Seek(byteOffSet[index], SeekOrigin.Begin);
+                    string? line = sr.ReadLine();
+                    Console.WriteLine($"{index} | {line}");
+                }
+            }
         }
         
-        public static void WorkFile()
+        private static string? WorkFile()
         {
-            OpenFileDialog fileDialog= new OpenFileDialog();
-            bool? success = fileDialog.ShowDialog();
-            if (success != null && success == true) 
+            var fileDialog = new OpenFileDialog
             {
-                //actual path.
-                string filePath = fileDialog.FileName;
-                //just the file's name.
-                string fileName = fileDialog.SafeFileName;
+                Title = "Select a log file.",
+                Filter = "Log Files (*.log; *.txt) | *.log; *.txt| All files (*.*)|*.*",
+                CheckFileExists = true,
+                Multiselect = false,
+            };
 
-                List<long> byteOffSet = GetByteOffSets(filePath);
-                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-                using (StreamReader sr = new StreamReader(fs))
-                {
-                    foreach (var index in ArbitrarySearch(byteOffSet, "this is red", filePath))
-                    {
-                        fs.Seek(byteOffSet[index], SeekOrigin.Begin);
-                        string? line = sr.ReadLine();
-                        Console.WriteLine($"{index} | {line}");
-                    }
-                }
-            } else
-            {
-                //picked nothing.
-            }
-            
+            return fileDialog.ShowDialog() == true ? fileDialog.FileName : null;
         }
+        //just the file's name.
+        //string fileName = fileDialog.SafeFileName
+
 
         private static Dictionary<string, List<int>> MkFilter(string filePath, List<long> byteOffSet)
 
