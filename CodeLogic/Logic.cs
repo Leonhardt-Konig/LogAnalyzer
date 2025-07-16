@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32;
@@ -12,12 +13,16 @@ namespace LogAnalyzer.CodeLogic
 {
     public class Logic
     {
+        
+        public static void PrintPath(string? filePath)
+        {
+             Debug.WriteLine($"{filePath}");
+        }
 
-        public static void LogAnalizerLogic()
+
+        /*public static void LogAnalizerLogic()
         {
             Debug.WriteLine("Hello");
-            string? filePath = WorkFile();
-            List<long> byteOffSet = GetByteOffSets(filePath);
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             using (StreamReader sr = new StreamReader(fs))
             {
@@ -28,9 +33,9 @@ namespace LogAnalyzer.CodeLogic
                     Console.WriteLine($"{index} | {line}");
                 }
             }
-        }
-        
-        private static string? WorkFile()
+        }*/
+
+        public static string? GetWorkFile()
         {
             var fileDialog = new OpenFileDialog
             {
@@ -85,7 +90,7 @@ namespace LogAnalyzer.CodeLogic
         }
 
         private static HashSet<string> Keywords = new HashSet<string> { "ERROR", "DEBUG", "FATAL", "INFO", "WARNING" };
-        private static List<long> GetByteOffSets(string filePath)
+        public static List<long> GetByteOffSets(string filePath)
         {
             try
             {
