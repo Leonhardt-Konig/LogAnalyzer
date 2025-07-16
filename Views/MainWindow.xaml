@@ -15,8 +15,15 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <ListView Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{Binding LogEntries}"/>
-        <Menu>
+        <ListView Grid.Row="1" Grid.ColumnSpan="2"
+                  x:Name="LineView"
+                  ItemsSource="{Binding LogEntries}"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Standard"
+                  ScrollViewer.CanContentScroll="True"
+        />
+
+            <Menu>
             <MenuItem Header="File">
                 <MenuItem Header="Open File" Click="OpenMenuItem_Click"/>
                 <MenuItem Header="Close File" Click="CloseMenuItem_Click"/>
