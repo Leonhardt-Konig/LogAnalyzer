@@ -128,7 +128,7 @@ namespace LogAnalyzer.CodeLogic
             }
         }
 
-        public static List<int> ArbitrarySearch(List<long> byteOffSet, string searchItem, string filePath)
+        public static List<int> ArbitrarySearch(List<long> byteOffSet,List<int> storedItems, string searchItem, string filePath)
         {
             //modify function to add items to a list as the user types the terms that are being looked for.
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
@@ -139,12 +139,15 @@ namespace LogAnalyzer.CodeLogic
                 {
                     for (int i = 0; i < byteOffSet.Count; i++)
                     {
-                        fs.Seek(byteOffSet[i], SeekOrigin.Begin);
-                        string? line = sr.ReadLine();
-                        if (line != null && line.Contains(searchItem, StringComparison.OrdinalIgnoreCase))
+                        if (!(storedItems.Contains(i)))
                         {
-                            //Console.WriteLine($"The arbitrary term: {searchItem} was found in this line:\r\n{line}");
-                            linesFound.Add(i);
+                            fs.Seek(byteOffSet[i], SeekOrigin.Begin);
+                            string? line = sr.ReadLine();
+                            if (line != null && line.Contains(searchItem, StringComparison.OrdinalIgnoreCase))
+                            {
+                                //Console.WriteLine($"The arbitrary term: {searchItem} was found in this line:\r\n{line}");
+                                linesFound.Add(i);
+                            }
                         }
                     }
                     return linesFound;

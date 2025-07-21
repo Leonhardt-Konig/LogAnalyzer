@@ -45,7 +45,7 @@ namespace LogAnalyzer.Views
         {
             filePath = Logic.GetWorkFile();
             await FindFirstLines(Logic.GetByteOffSets(filePath: filePath));
-            
+
         }
 
         public void CloseMenuItem_Click(object sender, RoutedEventArgs e)
@@ -53,7 +53,7 @@ namespace LogAnalyzer.Views
             filePath = null;
             LogEntries = new ObservableCollection<string>();
             LineView.ItemsSource = LogEntries;
-        } 
+        }
         public MainWindow()
         {
             InitializeComponent();
@@ -76,39 +76,42 @@ namespace LogAnalyzer.Views
             terms = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
         }
         //have an array/list to put the offsets specific to the arbitrary search
-        
+
         private void Button_Click(object sender, RoutedEventArgs e)
-        { 
+        {
+            List<int> tempSearchList = new List<int>();
             for (int i = 0; i < terms.Length; i++)
             {
-                List<int> tempSearchList = Logic.ArbitrarySearch(logOffsetsProcessed, terms[i], filePath);
-                foreach (int term in tempSearchList) 
+
+                tempSearchList = Logic.ArbitrarySearch(logOffsetsProcessed, tempSearchList, terms[i], filePath);
+                foreach (int term in tempSearchList)
                 {
                     Debug.WriteLine($"Index {term} for term: {terms[i]}");
                 }
             }
-            /*
+            //from here, go over the items and display them.
+
+        }
+        private void FindQueryLines(List<int> lineIdx)
+        {
+            try
             {
-                
-                foreach (var integer in tempList)
+                //use the indexes, seek to those specific lines and read them.
+                for (int i = 0;i < lineIdx.Count; i++)
                 {
-                    searchItemsFound.Add(integer);
-                    tempList.Remove(integer);
+                    using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                    using (StreamReader sr = new StreamReader(fs))
+                    {
+                        fs.Seek(logOffsetsProcessed[i], SeekOrigin.Begin);
+                        string? lineFound = sr.ReadLine();
+                    }
                 }
             }
-            FindFirstLines(searchItemsFound);*/
-        }
-        
-        /*List<int> searchItemsFound = new List<int>();
-        public List<long> GetNewOffsets(List<int> indexes)
-        {
-            //loop over the processed offset list 
-            foreach (var index in indexes)
+            catch (System.Exception)
             {
-                //loop over offsets, seek to offset and return line, add line to string list.
+                throw;
             }
-        }*/
+        }
     }
-    
 }
 
