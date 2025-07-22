@@ -20,6 +20,14 @@ namespace LogAnalyzer.Views
     //TODO: ADD SEARCH AND FILTERING FUNCTIONS.
     public partial class MainWindow : Window
     {
+        public class ViewState
+        {
+            //this class will control the state of the ui
+            //specifically, the text being shown (setting something or nothing);
+        }
+
+
+
         private string? filePath = null;
         //viewing logic.
         public ObservableCollection<string> LogEntries { get; set; } = new ObservableCollection<string>();
@@ -77,33 +85,37 @@ namespace LogAnalyzer.Views
         }
         //have an array/list to put the offsets specific to the arbitrary search
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private  void Button_Click(object sender, RoutedEventArgs e)
         {
+            LogEntries.Clear();
             List<int> tempSearchList = new List<int>();
             for (int i = 0; i < terms.Length; i++)
             {
 
                 tempSearchList = Logic.ArbitrarySearch(logOffsetsProcessed, tempSearchList, terms[i], filePath);
-                foreach (int term in tempSearchList)
-                {
-                    Debug.WriteLine($"Index {term} for term: {terms[i]}");
-                }
+                FindQueryLines(tempSearchList);
             }
             //from here, go over the items and display them.
-
         }
         private void FindQueryLines(List<int> lineIdx)
         {
             try
             {
                 //use the indexes, seek to those specific lines and read them.
-                for (int i = 0;i < lineIdx.Count; i++)
+                
+                for (int i = 0; i < lineIdx.Count; i++)
                 {
                     using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                     using (StreamReader sr = new StreamReader(fs))
                     {
-                        fs.Seek(logOffsetsProcessed[i], SeekOrigin.Begin);
+                        //modify function to not use indexes (as in 0,1,2 etc) but offsets!
+                        fs.Seek(logOffsetsProcessed[lineIdx[i]], SeekOrigin.Begin);
                         string? lineFound = sr.ReadLine();
+                        if (lineFound != null) 
+                        {                            
+                            LogEntries.Add(lineFound);
+                        }
+
                     }
                 }
             }

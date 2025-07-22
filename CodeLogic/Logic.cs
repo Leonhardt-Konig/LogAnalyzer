@@ -145,7 +145,7 @@ namespace LogAnalyzer.CodeLogic
                             string? line = sr.ReadLine();
                             if (line != null && line.Contains(searchItem, StringComparison.OrdinalIgnoreCase))
                             {
-                                //Console.WriteLine($"The arbitrary term: {searchItem} was found in this line:\r\n{line}");
+                                //Debug.WriteLine($"The arbitrary term: {searchItem} was found in this line:\r\n{line}");
                                 linesFound.Add(i);
                             }
                         }
