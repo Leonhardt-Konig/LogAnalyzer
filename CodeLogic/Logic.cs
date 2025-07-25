@@ -158,6 +158,10 @@ namespace LogAnalyzer.CodeLogic
                 }
             }
         }
+        public void QuerySearch() 
+        { 
+            
+        }
 
 
     }

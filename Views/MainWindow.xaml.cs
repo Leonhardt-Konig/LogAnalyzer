@@ -82,19 +82,25 @@ namespace LogAnalyzer.Views
             Debug.WriteLine($"{UserSearchBox.Text}");
             string input = UserSearchBox.Text;
             terms = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (terms.Length > 0) 
+            {
+                LogEntries.Clear();
+                List<int> tempSearchList = new List<int>();
+                for (int i = 0; i < terms.Length; i++)
+                {
+
+                    tempSearchList = Logic.ArbitrarySearch(logOffsetsProcessed, tempSearchList, terms[i], filePath);
+                    FindQueryLines(tempSearchList);
+                }
+            }
         }
         //have an array/list to put the offsets specific to the arbitrary search
-
+        //change the search to be done with TextChanged instead of a button. 
+        //Add a debounce (delay/timer) to count down so that searches aren't done with every 
+        //key press.
         private  void Button_Click(object sender, RoutedEventArgs e)
         {
-            LogEntries.Clear();
-            List<int> tempSearchList = new List<int>();
-            for (int i = 0; i < terms.Length; i++)
-            {
-
-                tempSearchList = Logic.ArbitrarySearch(logOffsetsProcessed, tempSearchList, terms[i], filePath);
-                FindQueryLines(tempSearchList);
-            }
+            
             //from here, go over the items and display them.
         }
         private void FindQueryLines(List<int> lineIdx)
