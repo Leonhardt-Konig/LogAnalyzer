@@ -51,7 +51,7 @@ namespace LogAnalyzer.CodeLogic
         //string fileName = fileDialog.SafeFileName
 
 
-        private static Dictionary<string, List<int>> MkFilter(string filePath, List<long> byteOffSet)
+        public static Dictionary<string, List<int>> MkFilter(string filePath, List<long> byteOffSet)
 
         {
             var keywordMap = new Dictionary<string, List<int>> {

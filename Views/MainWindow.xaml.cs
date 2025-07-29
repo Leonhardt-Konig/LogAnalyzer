@@ -16,8 +16,9 @@ using LogAnalyzer.CodeLogic;
 
 namespace LogAnalyzer.Views
 {
-    //TODO-LATER: OPTIMIZE THE RENDERING, DON'T LOAD STRINGS TO RAM?
-    //TODO: ADD SEARCH AND FILTERING FUNCTIONS.
+    //FILTERING WON'T BE INCLUDED ANYMORE
+    //OPTIMIZE TEXT RENDERING BY CREATING A "BUFFER" TO SHOW/LOAD A SPECIFIC AMOUNT OF ITEMS 
+    //
     public partial class MainWindow : Window
     {
         public class ViewState
@@ -29,9 +30,10 @@ namespace LogAnalyzer.Views
 
 
         private string? filePath = null;
+        private Dictionary<string, List<int>> filterDict = [];
         //viewing logic.
-        public ObservableCollection<string> LogEntries { get; set; } = new ObservableCollection<string>();
-        public List<long> logOffsetsProcessed = new List<long>();
+        public ObservableCollection<string> LogEntries { get; set; } = [];
+        public List<long> logOffsetsProcessed = [];
         public async Task FindFirstLines(List<long> OffSetList)
         {
             using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -46,14 +48,13 @@ namespace LogAnalyzer.Views
                 {
                     LogEntries.Add(line);
                 }
-                ;
             }
         }
         public async void OpenMenuItem_Click(object sender, RoutedEventArgs e)
         {
             filePath = Logic.GetWorkFile();
             await FindFirstLines(Logic.GetByteOffSets(filePath: filePath));
-
+            
         }
 
         public void CloseMenuItem_Click(object sender, RoutedEventArgs e)
@@ -93,16 +94,14 @@ namespace LogAnalyzer.Views
                     FindQueryLines(tempSearchList);
                 }
             }
+            else
+            {
+                
+            }
         }
         //have an array/list to put the offsets specific to the arbitrary search
         //change the search to be done with TextChanged instead of a button. 
-        //Add a debounce (delay/timer) to count down so that searches aren't done with every 
-        //key press.
-        private  void Button_Click(object sender, RoutedEventArgs e)
-        {
-            
-            //from here, go over the items and display them.
-        }
+        //Add a debounce (delay/timer) to count down so that searches aren't done with every key press
         private void FindQueryLines(List<int> lineIdx)
         {
             try

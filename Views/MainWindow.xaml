@@ -16,7 +16,6 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <TextBox Grid.Column="1" Height="20" Width="230" Margin="5" x:Name="UserSearchBox" TextChanged="UserSearchBox_TextChanged"/>
-        <Button Content="Search" Grid.Column="1" Click="Button_Click" x:Name="searchButton" HorizontalAlignment="Right"/>
         <ListView Grid.Row="1" Grid.ColumnSpan="2"
                   x:Name="LineView"
                   ItemsSource="{Binding LogEntries}"
