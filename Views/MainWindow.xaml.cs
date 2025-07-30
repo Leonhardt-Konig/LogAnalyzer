@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,6 +35,7 @@ namespace LogAnalyzer.Views
         //viewing logic.
         public ObservableCollection<string> LogEntries { get; set; } = [];
         public List<long> logOffsetsProcessed = [];
+        public ObservableCollection<string> RenderedLines { get; set; } = [];
         public async Task FindFirstLines(List<long> OffSetList)
         {
             using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -48,6 +50,10 @@ namespace LogAnalyzer.Views
                 {
                     LogEntries.Add(line);
                 }
+            }
+            for (int i = 0; i < 100; i++)
+            {
+                RenderedLines.Add(LogEntries[i]);
             }
         }
         public async void OpenMenuItem_Click(object sender, RoutedEventArgs e)
@@ -80,28 +86,31 @@ namespace LogAnalyzer.Views
         string[] terms;
         private void UserSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            LineView.ItemsSource = foundEntries;
+            foundEntries.Clear();
             Debug.WriteLine($"{UserSearchBox.Text}");
             string input = UserSearchBox.Text;
             terms = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (terms.Length > 0) 
             {
-                LogEntries.Clear();
                 List<int> tempSearchList = new List<int>();
                 for (int i = 0; i < terms.Length; i++)
                 {
 
                     tempSearchList = Logic.ArbitrarySearch(logOffsetsProcessed, tempSearchList, terms[i], filePath);
                     FindQueryLines(tempSearchList);
+                    LineView.ItemsSource = foundEntries;
                 }
             }
             else
             {
-                
+                LineView.ItemsSource = RenderedLines;
             }
         }
         //have an array/list to put the offsets specific to the arbitrary search
         //change the search to be done with TextChanged instead of a button. 
         //Add a debounce (delay/timer) to count down so that searches aren't done with every key press
+        public ObservableCollection<string> foundEntries = [];
         private void FindQueryLines(List<int> lineIdx)
         {
             try
@@ -118,7 +127,7 @@ namespace LogAnalyzer.Views
                         string? lineFound = sr.ReadLine();
                         if (lineFound != null) 
                         {                            
-                            LogEntries.Add(lineFound);
+                            foundEntries.Add(lineFound);
                         }
 
                     }
