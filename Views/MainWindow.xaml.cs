@@ -145,7 +145,7 @@ namespace LogAnalyzer.Views
             try
             {
                 //use the indexes, seek to those specific lines and read them.
-                
+
                 for (int i = 0; i < lineIdx.Count; i++)
                 {
                     using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
@@ -154,8 +154,8 @@ namespace LogAnalyzer.Views
                         //modify function to not use indexes (as in 0,1,2 etc) but offsets!
                         fs.Seek(logOffsetsProcessed[lineIdx[i]], SeekOrigin.Begin);
                         string? lineFound = sr.ReadLine();
-                        if (lineFound != null) 
-                        {                            
+                        if (lineFound != null)
+                        {
                             foundEntries.Add(lineFound);
                         }
 
@@ -167,10 +167,7 @@ namespace LogAnalyzer.Views
                 throw;
             }
         }
-       
-
-        
-        public void ShowPosition()
+        private void LineView_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             var scrollViewer = FindVisualChild<ScrollViewer>(LineView);
             //?????????????????
@@ -179,12 +176,7 @@ namespace LogAnalyzer.Views
             //when scroll has been detected, check where the anchor(first listview item) is located
             //past a certain threshold, "flush" the buffer, removing a number of items before the currently top visible item which will become the anchor
             //from there, fill the buffer with the number of available slots and render them.
-        }
-
-        private void LineView_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-
-            double lineHeight = (16 * 1.5);
+            double lineHeight = (16 * 1.25);
             int firstVisibleLine = (int)(e.VerticalOffset / lineHeight);              
             int visibleLines = (int)(e.ViewportHeight / lineHeight);
             Debug.WriteLine($"First visible line at: {firstVisibleLine}");
