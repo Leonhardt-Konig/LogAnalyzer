@@ -12,7 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Drawing;
 using LogAnalyzer.CodeLogic;
 
 namespace LogAnalyzer.Views
@@ -173,6 +173,22 @@ namespace LogAnalyzer.Views
         public void ShowPosition()
         {
             var scrollViewer = FindVisualChild<ScrollViewer>(LineView);
+            //?????????????????
+            //get the pixel value of height of list items or just use static value. 16px == 16 (int)?
+            //divide line height for viewport height to get the number of items that are roughly being rendered. 
+            //when scroll has been detected, check where the anchor(first listview item) is located
+            //past a certain threshold, "flush" the buffer, removing a number of items before the currently top visible item which will become the anchor
+            //from there, fill the buffer with the number of available slots and render them.
+        }
+
+        private void LineView_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+
+            double lineHeight = (16 * 1.5);
+            int firstVisibleLine = (int)(e.VerticalOffset / lineHeight);              
+            int visibleLines = (int)(e.ViewportHeight / lineHeight);
+            Debug.WriteLine($"First visible line at: {firstVisibleLine}");
+            Debug.WriteLine($"Number of visible lines: {visibleLines}");
         }
     }
 }

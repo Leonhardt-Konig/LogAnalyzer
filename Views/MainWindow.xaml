@@ -20,8 +20,9 @@
                   x:Name="LineView"
                   ItemsSource="{Binding RenderedLines}"
                   VirtualizingPanel.IsVirtualizing="False"
-                  VirtualizingPanel.VirtualizationMode="Standard"
-                  ScrollViewer.CanContentScroll="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  ScrollViewer.CanContentScroll="False"
+                  ScrollViewer.ScrollChanged="LineView_ScrollChanged"
         />
 
             <Menu>
