@@ -182,6 +182,11 @@ namespace LogAnalyzer.Views
             Debug.WriteLine($"First visible line at: {firstVisibleLine}");
             Debug.WriteLine($"Number of visible lines: {visibleLines}");
             var oldItems = new Dictionary<int, string>();
+            //if current first visible line is higher than the last by 25~50 lines, remove the lines before the current first visible line
+            //add them to oldItems to keep previous lines on memory 
+            //as items are removed, add new items according to the last one that is currently being displayed. 
+            //as the scroll goes up, check for the difference in the same way but by using different logic to avoid bugs
+            //remove items from the bottom and include new items at the top (will need to check how to do this.)
         }
     }
 }
