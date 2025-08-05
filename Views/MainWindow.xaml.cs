@@ -49,7 +49,7 @@ namespace LogAnalyzer.Views
             return null;
        }
         private string? filePath = null;
-        public ObservableCollection<string> LogEntries { get; set; } = [];
+        //public ObservableCollection<string> LogEntries { get; set; } = [];
         public List<long> logOffsetsProcessed = [];
         public ObservableCollection<string> RenderedLines { get; set; } = [];
         public async Task FindFirstLines(List<long> OffSetList)
@@ -70,7 +70,11 @@ namespace LogAnalyzer.Views
             }
             for (int i = 0; i < 100; i++)
             {
-                RenderedLines.Add(LogEntries[i]);
+                foreach (var item in oldItems)
+                {
+                    RenderedLines.Add(item.Value);
+                }
+                
             }
         }
         public async void OpenMenuItem_Click(object sender, RoutedEventArgs e)
