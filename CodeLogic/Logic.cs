@@ -7,8 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32;
-//TODO: WORK WITH THE LOGIC AND MODIFY IT TO WORK WITH WPF;
-
 namespace LogAnalyzer.CodeLogic
 {
     public class Logic
@@ -18,23 +16,6 @@ namespace LogAnalyzer.CodeLogic
         {
              Debug.WriteLine($"{filePath}");
         }
-
-
-        /*public static void LogAnalizerLogic()
-        {
-            Debug.WriteLine("Hello");
-            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-            using (StreamReader sr = new StreamReader(fs))
-            {
-                foreach (var index in ArbitrarySearch(byteOffSet, "this is red", filePath))
-                {
-                    fs.Seek(byteOffSet[index], SeekOrigin.Begin);
-                    string? line = sr.ReadLine();
-                    Console.WriteLine($"{index} | {line}");
-                }
-            }
-        }*/
-
         public static string? GetWorkFile()
         {
             var fileDialog = new OpenFileDialog
@@ -47,10 +28,6 @@ namespace LogAnalyzer.CodeLogic
 
             return fileDialog.ShowDialog() == true ? fileDialog.FileName : null;
         }
-        //just the file's name.
-        //string fileName = fileDialog.SafeFileName
-
-
         public static Dictionary<string, List<int>> MkFilter(string filePath, List<long> byteOffSet)
 
         {
@@ -158,12 +135,6 @@ namespace LogAnalyzer.CodeLogic
                 }
             }
         }
-        public void QuerySearch() 
-        { 
-            
-        }
-
-
     }
 }
 
