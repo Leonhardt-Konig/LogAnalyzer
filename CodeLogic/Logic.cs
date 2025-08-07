@@ -28,7 +28,7 @@ namespace LogAnalyzer.CodeLogic
 
             return fileDialog.ShowDialog() == true ? fileDialog.FileName : null;
         }
-        public static Dictionary<string, List<int>> MkFilter(string filePath, List<long> byteOffSet)
+        /*public static Dictionary<string, List<int>> MkFilter(string filePath, List<long> byteOffSet)
 
         {
             var keywordMap = new Dictionary<string, List<int>> {
@@ -65,8 +65,8 @@ namespace LogAnalyzer.CodeLogic
                 }
             }
         }
-
-        private static HashSet<string> Keywords = new HashSet<string> { "ERROR", "DEBUG", "FATAL", "INFO", "WARNING" };
+        */
+        
         public static List<long> GetByteOffSets(string filePath)
         {
             try
@@ -74,7 +74,7 @@ namespace LogAnalyzer.CodeLogic
                 byte[] buffer = new byte[32768];
                 List<long> offSetList = new List<long>();
                 long currentOffset = 0;
-                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                 {
                     int bytesRead;
                     offSetList.Add(0);
@@ -108,12 +108,13 @@ namespace LogAnalyzer.CodeLogic
         public static List<int> ArbitrarySearch(List<long> byteOffSet,List<int> storedItems, string searchItem, string filePath)
         {
             //modify function to add items to a list as the user types the terms that are being looked for.
-            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-            using (StreamReader sr = new StreamReader(fs))
+            try
             {
-                List<int> linesFound = new List<int>();
-                try
+                using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                using var sr = new StreamReader(fs);
                 {
+                    List<int> linesFound = new List<int>();
+                
                     for (int i = 0; i < byteOffSet.Count; i++)
                     {
                         if (!(storedItems.Contains(i)))
@@ -127,12 +128,15 @@ namespace LogAnalyzer.CodeLogic
                             }
                         }
                     }
+                    fs.Dispose();
+                    sr.Dispose();
                     return linesFound;
                 }
-                catch (System.Exception)
-                {
-                    throw;
-                }
+                
+            }
+            catch (System.Exception)
+            {
+                throw;
             }
         }
     }

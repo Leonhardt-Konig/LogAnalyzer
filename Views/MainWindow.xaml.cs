@@ -60,7 +60,6 @@ namespace LogAnalyzer.Views
 
 
         private string? filePath = null;
-        private Dictionary<string, List<int>> filterDict = [];
         //viewing logic.
         public ObservableCollection<string> LogEntries { get; set; } = [];
         public List<long> logOffsetsProcessed = [];
@@ -80,6 +79,9 @@ namespace LogAnalyzer.Views
                     LogEntries.Add(line);
                 }
             }
+            fs.Dispose();
+            sr.Dispose();
+            //add a fix to a memory leak/ infinite generation of lines after opening a new file, after closing another.
             for (int i = 0; i < 100; i++)
             {
                 RenderedLines.Add(LogEntries[i]);
@@ -89,14 +91,17 @@ namespace LogAnalyzer.Views
         {
             filePath = Logic.GetWorkFile();
             await FindFirstLines(Logic.GetByteOffSets(filePath: filePath));
-
+            //not the issue? 
         }
 
         public void CloseMenuItem_Click(object sender, RoutedEventArgs e)
         {
             filePath = null;
-            LogEntries = new ObservableCollection<string>();
-            LineView.ItemsSource = LogEntries;
+            LogEntries.Clear();
+            RenderedLines.Clear();
+            logOffsetsProcessed.Clear();
+            UserSearchBox.Clear();
+            //GC.Collect();
         }
         public MainWindow()
         {
@@ -113,7 +118,7 @@ namespace LogAnalyzer.Views
 
 
         string[] terms;
-        private void UserSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        private async void UserSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             LineView.ItemsSource = foundEntries;
             foundEntries.Clear();
@@ -127,7 +132,7 @@ namespace LogAnalyzer.Views
                 {
 
                     tempSearchList = Logic.ArbitrarySearch(logOffsetsProcessed, tempSearchList, terms[i], filePath);
-                    FindQueryLines(tempSearchList);
+                    await FindQueryLines(tempSearchList);
                     LineView.ItemsSource = foundEntries;
                 }
             }
@@ -140,7 +145,7 @@ namespace LogAnalyzer.Views
         //change the search to be done with TextChanged instead of a button. 
         //Add a debounce (delay/timer) to count down so that searches aren't done with every key press
         public ObservableCollection<string> foundEntries = [];
-        private void FindQueryLines(List<int> lineIdx)
+        private async Task FindQueryLines(List<int> lineIdx)
         {
             try
             {
@@ -148,26 +153,28 @@ namespace LogAnalyzer.Views
 
                 for (int i = 0; i < lineIdx.Count; i++)
                 {
-                    using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-                    using (StreamReader sr = new StreamReader(fs))
+                    using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                    using var sr = new StreamReader(fs);
                     {
                         //modify function to not use indexes (as in 0,1,2 etc) but offsets!
                         fs.Seek(logOffsetsProcessed[lineIdx[i]], SeekOrigin.Begin);
-                        string? lineFound = sr.ReadLine();
+                        string? lineFound = await sr.ReadLineAsync();
                         if (lineFound != null)
                         {
                             foundEntries.Add(lineFound);
                         }
-
                     }
+                    fs.Dispose();
+                    sr.Dispose();
                 }
+                
             }
             catch (System.Exception)
             {
                 throw;
             }
         }
-        private void LineView_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        private async void LineView_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             var scrollViewer = FindVisualChild<ScrollViewer>(LineView);
             //?????????????????
@@ -181,12 +188,26 @@ namespace LogAnalyzer.Views
             int visibleLines = (int)(e.ViewportHeight / lineHeight);
             Debug.WriteLine($"First visible line at: {firstVisibleLine}");
             Debug.WriteLine($"Number of visible lines: {visibleLines}");
-            var oldItems = new Dictionary<int, string>();
+            if (firstVisibleLine > 70)
+            {
+                await UpdateBuffer(firstVisibleLine);
+            }
+            //var oldItems = new Dictionary<int, string>();
             //if current first visible line is higher than the last by 25~50 lines, remove the lines before the current first visible line
             //add them to oldItems to keep previous lines on memory 
             //as items are removed, add new items according to the last one that is currently being displayed. 
             //as the scroll goes up, check for the difference in the same way but by using different logic to avoid bugs
             //remove items from the bottom and include new items at the top (will need to check how to do this.)
+        }
+
+        private async Task UpdateBuffer(int skipIndex)
+        {
+            RenderedLines.Clear();
+            foreach (var log in LogEntries.Skip(skipIndex).Take(RenderedLines.Count + 140))
+            {
+                RenderedLines.Add(log);
+            }
+            LineView.ItemsSource = RenderedLines;
         }
     }
 }
@@ -211,5 +232,5 @@ void UpdateBuffer(int startIndex)
 
 
 */
-//need the items' offset?
+//
 
