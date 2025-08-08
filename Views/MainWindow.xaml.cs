@@ -188,10 +188,15 @@ namespace LogAnalyzer.Views
             int visibleLines = (int)(e.ViewportHeight / lineHeight);
             Debug.WriteLine($"First visible line at: {firstVisibleLine}");
             Debug.WriteLine($"Number of visible lines: {visibleLines}");
-            if (firstVisibleLine > 70)
+            Debug.WriteLine($"{e.VerticalChange}");
+            if (e.VerticalChange > 1) //this works, need to add more conditions to make sure it won't trigger all the time. 
             {
-                await UpdateBuffer(firstVisibleLine);
+                Debug.WriteLine("Needs to update buffer. Positive change.");
+            } else
+            {
+                Debug.WriteLine("Needs to update buffer. Negative change.");
             }
+            //do-while doesn't seem to work very well. May be conditions used (probably). A simple while loop should be better.
             //var oldItems = new Dictionary<int, string>();
             //if current first visible line is higher than the last by 25~50 lines, remove the lines before the current first visible line
             //add them to oldItems to keep previous lines on memory 
@@ -202,8 +207,14 @@ namespace LogAnalyzer.Views
 
         private async Task UpdateBuffer(int skipIndex)
         {
+            //this does update the entries, however...  
+            //use the vertical offset; 
+            //keep a control so it can be checked for increase or decrease, act accordingly. 
+            //e.g. VO = 10 > VO now = 8 (decreased, get more items from the start) and vice-versa
+            //
+
             RenderedLines.Clear();
-            foreach (var log in LogEntries.Skip(skipIndex).Take(RenderedLines.Count + 140))
+            foreach (var log in LogEntries.Skip(skipIndex).Take(140))
             {
                 RenderedLines.Add(log);
             }
