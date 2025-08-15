@@ -23,6 +23,7 @@
                   VirtualizingPanel.VirtualizationMode="Recycling"
                   ScrollViewer.CanContentScroll="False"
                   ScrollViewer.ScrollChanged="LineView_ScrollChanged"
+
         />
 
             <Menu>
